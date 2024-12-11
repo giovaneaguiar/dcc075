@@ -48,6 +48,21 @@ function caesarCypher(texto, chave) {
     return textoCifrado;
 }
 
+function calcularFrequencia(texto) {
+    const frequencia = {};
+
+    // Contar frequência de cada caractere
+    for (const char of texto) {
+        frequencia[char] = (frequencia[char] || 0) + 1;
+    }
+
+    // Transformar em array e ordenar por frequência decrescente
+    const ranking = Object.entries(frequencia)
+        .sort((a, b) => b[1] - a[1]);
+
+    return ranking;
+}
+
 function main() {
 
     // 1 - Cifra de César
@@ -55,8 +70,16 @@ function main() {
     const chaveCesar = 3;
 
     // Teste da cifra:
-    console.log("1 - O texto \"", textoCesar, "\" cifrado na Cifra de César é \"", caesarCypher(textoCesar, chaveCesar), "\"");
+    const textoCifrado = caesarCypher(textoCesar, chaveCesar);
+    console.log("1 - O texto \"", textoCesar, "\" cifrado na Cifra de César é \"", textoCifrado, "\"");
 
+    // Calcular frequência
+    const frequencia = calcularFrequencia(textoCifrado);
+
+    console.log("\nRanking de frequência dos caracteres:");
+    frequencia.forEach(([char, count], index) => {
+        console.log(`${index + 1} - '${char}' - ${count} vez(es)`);
+    });
 }
 
 main();

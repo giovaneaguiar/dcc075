@@ -76,6 +76,7 @@ function main() {
     // Calcular frequência
     const frequencia = calcularFrequencia(textoCifrado);
 
+    // Exibir ranking de frequência
     console.log("\nRanking de frequência dos caracteres:");
     frequencia.forEach(([char, count], index) => {
         console.log(`${index + 1} - '${char}' - ${count} vez(es)`);

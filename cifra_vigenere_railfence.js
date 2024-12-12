@@ -1,55 +1,37 @@
-// Grupo: 
-// GIOVANE NILMER DE OLIVEIRA SANTOS
-// GIOVANE MACHADO AGUIAR
-// BRUNO
-// MARCOS
-
-// Para testar, basta ter o Node.js instalado e, na mesma pasta do arquivo, rodar o comando:
-// node cifra_vigenere_railfence.js
-
-// Alterar os textos e chaves na função main();
-
-class Fila {
-    constructor() {
-        this.elementos = [];
-    }
-
-    // Adicionar à fila
-    enqueue(elemento) {
-        this.elementos.push(elemento);
-    }
-
-    // Remover da fila
-    dequeue() {
-        this.elementos.shift();
-    }
-
-    isEmpty() {
-        return this.elementos.length === 0;
-    }
-}
-
 function vigenereCypher(texto, chave) {
-    const alfabeto = 'abcdefghijklmnopqrstuvwxyz';
-    let textoCifrado = '';
+    let resultado = "";
+
+    // Ajusta a chave para o mesmo tamanho da mensagem, ignorando caracteres não alfabéticos
+    let chaveExpandida = "";
     let indiceChave = 0;
-
     for (let i = 0; i < texto.length; i++) {
-        const caractere = texto[i].toLowerCase();
-        const indiceCaractere = alfabeto.indexOf(caractere);
-
-        if (indiceCaractere !== -1) {
-            const indiceChaveAtual = alfabeto.indexOf(chave[indiceChave]);
-            const novoIndice = (indiceCaractere + indiceChaveAtual) % alfabeto.length;
-            textoCifrado += alfabeto[novoIndice];
-
-            indiceChave = (indiceChave + 1) % chave.length;
+        if (/[a-zA-Z]/.test(texto[i])) {
+            chaveExpandida += chave[indiceChave % chave.length];
+            indiceChave++;
         } else {
-            textoCifrado += caractere;
+            chaveExpandida += " "; // Mantém espaços para alinhamento
         }
     }
 
-    return textoCifrado;
+    // Encripta o texto
+    let indiceChaveExpandida = 0;
+    for (let i = 0; i < texto.length; i++) {
+        const caractere = texto[i];
+
+        if (/[a-zA-Z]/.test(caractere)) {
+            const inicio = caractere === caractere.toUpperCase() ? 65 : 97;
+            const deslocamento = chaveExpandida[indiceChaveExpandida].toUpperCase().charCodeAt(0) - 65;
+
+            const novoCaractere = String.fromCharCode(((caractere.charCodeAt(0) - inicio + deslocamento) % 26) + inicio);
+            resultado += novoCaractere;
+
+            indiceChaveExpandida++;
+        } else {
+            resultado += caractere;
+        }
+    }
+
+    return resultado;
 }
 
 function railFenceCypher(texto, numTrilhas) {
@@ -58,8 +40,7 @@ function railFenceCypher(texto, numTrilhas) {
     let trilhaAtual = 0;
 
     for (let i = 0; i < texto.length; i++) {
-        const caractere = texto[i];
-        trilhas[trilhaAtual].push(caractere);
+        trilhas[trilhaAtual].push(texto[i]);
 
         if (trilhaAtual === 0) {
             direcao = 1;
@@ -70,31 +51,58 @@ function railFenceCypher(texto, numTrilhas) {
         trilhaAtual += direcao;
     }
 
-    const textoCifrado = trilhas.flat().join('');
-    return textoCifrado;
+    return trilhas.flat().join('');
 }
 
 function main() {
-    // Textos para cifrar + chaves / número de trilhas:
+    const readline = require('readline');
 
-    // 2 - Cifra de Vigenere
-    const textoVigenere = "wearediscoveredsaveyourself";
-    const chaveVigenere = "deceptive";
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
 
-    // 3 - Cifra Rail Fence
-    const textoRailFence = "meetmeafterthetogaparty";
-    const numTrilhas = 2;
+    rl.question("Digite o texto para encriptação: ", (texto) => {
+        rl.question("Digite a chave para Vigenère (string): ", (chave) => {
+            rl.question("Digite o número de trilhas para Rail Fence: ", (numTrilhas) => {
+                numTrilhas = parseInt(numTrilhas);
 
-    // Testes das cifras:
-    console.log("1 - O texto \"", textoVigenere, "\" cifrado na Cifra de Vigenère é \"", vigenereCypher(textoVigenere, chaveVigenere), "\"");
-    console.log("2 - O texto \"", textoRailFence, "\" cifrado na Cifra Rail Fence é \"", railFenceCypher(textoRailFence, numTrilhas), "\"");
+                // Cifra Vigenère
+                const resultadoCifradoVigenere = vigenereCypher(texto, chave);
+                console.log("\nTexto cifrado em Vigenère: ", resultadoCifradoVigenere);
 
-    // Teste simultâneo: Vigenère + Rail Fence
-    const textoCifradoVigenere = vigenereCypher(textoVigenere, chaveVigenere);
-    const textoCifradoCombinado = railFenceCypher(textoCifradoVigenere, numTrilhas);
+                // Cifra Rail Fence
+                const resultadoCifradoRailFence = railFenceCypher(texto, numTrilhas);
+                console.log("Texto cifrado em Rail Fence: ", resultadoCifradoRailFence);
 
-    console.log("\nO texto \"", textoVigenere, "\" cifrado na Cifra de Vigenère é \"", textoCifradoVigenere, 
-        "\" e, aplicado o Rail Fence, é \"", textoCifradoCombinado, "\"");
+
+                rl.question("Digite o numero sucessivamente a cifra de Vigenére e Rail Fence ao mesmo texto: ", (num) => {
+                    num = parseInt(num);
+
+                    if (isNaN(num)) {
+                        console.error("Deve ser número inteiro.");
+                        rl.close();
+                        return;
+                    }
+
+                    let textoCifradoRailFence = texto;
+                    let textoCifradoVigenere = texto;
+                    for (let i = 0; i < num; i++) {
+                        textoCifradoVigenere = vigenereCypher(textoCifradoVigenere, chave)
+                        textoCifradoRailFence = railFenceCypher(textoCifradoRailFence, numTrilhas);
+                    }
+
+                    console.log("\nTexto cifrado em Vigenère: ", textoCifradoVigenere);
+                    console.log("Texto cifrado em Rail Fence: ", textoCifradoRailFence);
+
+                    rl.close();
+
+                })
+
+
+            });
+        });
+    });
 }
 
 main();

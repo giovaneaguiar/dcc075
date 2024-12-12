@@ -2,47 +2,28 @@
 // GIOVANE NILMER DE OLIVEIRA SANTOS
 // GIOVANE MACHADO AGUIAR
 // BRUNO
-// MARCOS
+// MARCOS MATEUS OLIVEIRA DOS SANTOS - MATRICULA: 201835019
 
 // Para testar, basta ter o Node.js instalado e, na mesma pasta do arquivo, rodar o comando:
 // node cifra_de_cesar.js
 
-// Alterar os textos e chaves na função main();
-
-class Fila {
-    constructor() {
-        this.elementos = [];
-    }
-
-    // Adicionar à fila
-    enqueue(elemento) {
-        this.elementos.push(elemento);
-    }
-
-    // Remover da fila
-    dequeue() {
-        this.elementos.shift();
-    }
-
-    isEmpty() {
-        return this.elementos.length === 0;
-    }
-}
 
 function caesarCypher(texto, chave) {
-    const alfabeto = 'abcdefghijklmnopqrstuvwxyz';
+
     let textoCifrado = '';
 
     for (let i = 0; i < texto.length; i++) {
-        const caractere = texto[i].toLowerCase();
-        const indice = alfabeto.indexOf(caractere);
+        const caractere = texto[i];
 
-        if (indice !== -1) {
-            const novoIndice = (indice + chave) % alfabeto.length;
-            textoCifrado += alfabeto[novoIndice];
+        if (/[a-zA-Z]/.test(caractere)) {
+            let inicio = caractere === caractere.toUpperCase() ? 65 : 97;
+
+            let novoCaractere = String.fromCharCode(((caractere.charCodeAt(0) - inicio + chave) % 26) + inicio);
+            textoCifrado += novoCaractere;
         } else {
             textoCifrado += caractere;
         }
+
     }
 
     return textoCifrado;
@@ -63,24 +44,45 @@ function calcularFrequencia(texto) {
     return ranking;
 }
 
+
+
 function main() {
 
-    // 1 - Cifra de César
-    const textoCesar = "meet me after the toga party";
-    const chaveCesar = 3;
+    const readline = require('readline');
 
-    // Teste da cifra:
-    const textoCifrado = caesarCypher(textoCesar, chaveCesar);
-    console.log("1 - O texto \"", textoCesar, "\" cifrado na Cifra de César é \"", textoCifrado, "\"");
-
-    // Calcular frequência
-    const frequencia = calcularFrequencia(textoCifrado);
-
-    // Exibir ranking de frequência
-    console.log("\nRanking de frequência dos caracteres:");
-    frequencia.forEach(([char, count], index) => {
-        console.log(`${index + 1} - '${char}' - ${count} vez(es)`);
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
     });
+
+    rl.question("Digite o texto para encriptação: ", (TEXTO_CIFRA) => {
+        console.log("Texto: ", TEXTO_CIFRA)
+        rl.question("Digite o valor do deslocamento (chave): ", (CHAVE) => {
+
+            CHAVE = parseInt(CHAVE);
+
+            if (isNaN(CHAVE)) {
+                console.error("A chave deve ser um número inteiro.");
+                rl.close();
+                return;
+            }
+
+            const textoCifrado = caesarCypher(TEXTO_CIFRA, CHAVE);
+            console.log("Texto: ", TEXTO_CIFRA)
+            console.log("Cifra de César: ", textoCifrado)
+
+            const frequencia = calcularFrequencia(textoCifrado);
+
+            // Exibir ranking de frequência
+            console.log("\nRanking de frequência dos caracteres:");
+            frequencia.forEach(([char, count], index) => {
+                console.log(`${index + 1} - '${char}' - ${count}x`);
+            });
+
+            rl.close();
+        });
+    });
+
 }
 
 main();

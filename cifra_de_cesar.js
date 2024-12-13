@@ -1,7 +1,7 @@
 // Grupo: 
 // GIOVANE NILMER DE OLIVEIRA SANTOS
 // GIOVANE MACHADO AGUIAR
-// BRUNO
+// BRUNO EDSON DE PAIVA ALVES
 // MARCOS MATEUS OLIVEIRA DOS SANTOS - MATRICULA: 201835019
 
 // Para testar, basta ter o Node.js instalado e, na mesma pasta do arquivo, rodar o comando:
